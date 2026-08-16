@@ -15,9 +15,10 @@ function Register() {
     setLoading(true)
     try {
       const res = await api.post('/api/auth/register', { name, email, password })
+      const newUser = res.data.user
       localStorage.setItem('token', res.data.token)
-      localStorage.setItem('user', JSON.stringify(res.data.user))
-      navigate('/')
+      localStorage.setItem('user', JSON.stringify(newUser))
+      navigate(newUser.role === 'ADMIN' ? '/admin' : '/')
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed')
     }

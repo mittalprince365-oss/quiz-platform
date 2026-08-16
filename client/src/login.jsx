@@ -14,9 +14,10 @@ function Login() {
     setLoading(true)
     try {
       const res = await api.post('/api/auth/login', { email, password })
+      const loggedInUser = res.data.user
       localStorage.setItem('token', res.data.token)
-      localStorage.setItem('user', JSON.stringify(res.data.user))
-      navigate('/')
+      localStorage.setItem('user', JSON.stringify(loggedInUser))
+      navigate(loggedInUser.role === 'ADMIN' ? '/admin' : '/')
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed')
     }

@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './Login'
 import Register from './Register'
 import api from './api'
+import AdminDashboard from './AdminDashboard'
+import AdminUsers from './AdminUsers'
 
 // abhi ke liye simple home page (Day 4 mein asli dashboard banega)
 function Home() {
@@ -65,6 +67,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
       </Routes>
     </BrowserRouter>
   )
