@@ -1,17 +1,17 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// PostgreSQL se connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-// test connection
-pool.query('SELECT NOW()', (err, res) => {
+pool.query('SELECT current_database(), current_user, (SELECT count(*) FROM public.users) AS user_count', (err, res) => {
   if (err) {
-    console.log('❌ Database connection failed:', err.message);
+    console.log('❌ DB error:', err.message);
   } else {
-    console.log('✅ Database connected at', res.rows[0].now);
+    console.log('✅ Connected to DB:', res.rows[0].current_database);
+    console.log('👤 As user:', res.rows[0].current_user);
+    console.log('📊 Users in public.users:', res.rows[0].user_count);
   }
 });
 

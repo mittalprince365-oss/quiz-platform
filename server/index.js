@@ -3,11 +3,21 @@ const cors = require('cors');
 require('dotenv').config();
 const pool = require('./db');
 const authRoutes = require('./auth');
+const { requireAuth, requireAdmin } = require('./middleware');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+// koi bhi logged-in user
+app.get('/api/me', requireAuth, (req, res) => {
+  res.json({ message: 'You are logged in', user: req.user });
+});
+
+// sirf admin
+app.get('/api/admin/test', requireAuth, requireAdmin, (req, res) => {
+  res.json({ message: 'Welcome Admin! You have admin access.' });
+});
 
 app.get('/api/health', (req, res) => {
   res.json({

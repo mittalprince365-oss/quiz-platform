@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './Login'
 import Register from './Register'
+import api from './api'
 
 // abhi ke liye simple home page (Day 4 mein asli dashboard banega)
 function Home() {
@@ -10,6 +11,15 @@ function Home() {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     window.location.href = '/login'
+  }
+
+  const testAdmin = async () => {
+    try {
+      const res = await api.get('/api/admin/test')
+      alert(res.data.message)
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error')
+    }
   }
 
   if (!user) return <Navigate to="/login" />
@@ -37,6 +47,12 @@ function Home() {
           </span>
         </p>
         <p className="text-slate-400">Status: {user.status}</p>
+        <button
+          onClick={testAdmin}
+          className="mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm"
+        >
+          Test Admin Access
+        </button>
       </div>
     </div>
   )
