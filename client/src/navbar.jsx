@@ -32,6 +32,9 @@ function Navbar() {
                 <Link to="/admin/users" className={linkClass('/admin/users')}>
                   Users
                 </Link>
+                <Link to="/admin/quizzes" className={linkClass('/admin/quizzes')}>
+                  Quizzes
+                </Link>
               </>
             ) : (
               <Link to="/" className={linkClass('/')}>
