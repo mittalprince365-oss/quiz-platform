@@ -8,6 +8,7 @@ import AdminQuestions from './AdminQuestions'
 import StudentQuizzes from './StudentQuizzes'
 import QuizDetails from './QuizDetails'
 import QuizAttempt from './QuizAttempt'
+import Result from './Result'
 
 function StudentHome() {
   const user = JSON.parse(localStorage.getItem('user') || 'null')
@@ -29,6 +30,7 @@ function App() {
         <Route path="/admin/quizzes/:quizId/questions" element={<AdminQuestions />} />
         <Route path="/quiz/:id" element={<QuizDetails />} />
         <Route path="/quiz/:id/attempt" element={<QuizAttempt />} />
+        <Route path="/result" element={<Result />} />
       </Routes>
     </BrowserRouter>
   )

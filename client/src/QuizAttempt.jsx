@@ -43,17 +43,25 @@ function QuizAttempt() {
     setAnswers({ ...answers, [questionId]: optionId })
   }
 
-  const handleSubmit = (auto = false) => {
+  const handleSubmit = async (auto = false) => {
     if (submittedRef.current) return
     if (!auto && !confirm('Submit the quiz?')) return
     submittedRef.current = true
 
-    // abhi ke liye sirf answers dikhate hain (Day 8 mein server bhejenge)
-    console.log('Answers:', answers)
-    alert('Quiz submitted! (Scoring comes on Day 8)')
-    navigate('/')
-  }
+    const timeTaken = quiz.duration * 60 - (timeLeft || 0) // seconds lagaaye
 
+    try {
+      const res = await api.post(`/api/student/quizzes/${id}/submit`, {
+        answers,
+        time_taken: timeTaken,
+      })
+      // result page pe bhejo, data saath le jao
+      navigate('/result', { state: res.data })
+    } catch (err) {
+      alert('Could not submit quiz. Please try again.')
+      submittedRef.current = false
+    }
+  }
   const formatTime = (s) => {
     const m = Math.floor(s / 60)
     const sec = s % 60
