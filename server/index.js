@@ -7,6 +7,7 @@ const { requireAuth, requireAdmin } = require('./middleware');
 const adminRoutes = require('./adminRoutes');
 const quizRoutes = require('./quizRoutes');
 const questionRoutes = require('./questionRoutes');
+const studentRoutes = require('./studentRoutes');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -14,6 +15,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/questions', questionRoutes);
+app.use('/api/student', studentRoutes);
 // koi bhi logged-in user
 app.get('/api/me', requireAuth, (req, res) => {
   res.json({ message: 'You are logged in', user: req.user });
