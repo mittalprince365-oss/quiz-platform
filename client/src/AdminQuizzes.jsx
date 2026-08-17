@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from './api'
 import Navbar from './Navbar'
 
@@ -9,6 +10,7 @@ const empty = {
 }
 
 function AdminQuizzes() {
+  const navigate = useNavigate()
   const [quizzes, setQuizzes] = useState([])
   const [form, setForm] = useState(empty)
   const [editId, setEditId] = useState(null)
@@ -200,6 +202,12 @@ function AdminQuizzes() {
                         Unpublish
                       </button>
                     )}
+                    <button
+                      onClick={() => navigate(`/admin/quizzes/${q.id}/questions`)}
+                      className="bg-purple-900 hover:bg-purple-800 text-purple-200 px-3 py-1 rounded text-xs"
+                    >
+                      Questions
+                    </button>
                     <button
                       onClick={() => startEdit(q)}
                       className="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded text-xs"

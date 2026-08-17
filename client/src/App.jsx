@@ -5,6 +5,7 @@ import api from './api'
 import AdminDashboard from './AdminDashboard'
 import AdminUsers from './AdminUsers'
 import AdminQuizzes from './AdminQuizzes'
+import AdminQuestions from './AdminQuestions'
 
 // abhi ke liye simple home page (Day 4 mein asli dashboard banega)
 function Home() {
@@ -71,6 +72,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/quizzes" element={<AdminQuizzes />} />
+        <Route path="/admin/quizzes/:quizId/questions" element={<AdminQuestions />} />
       </Routes>
     </BrowserRouter>
   )
