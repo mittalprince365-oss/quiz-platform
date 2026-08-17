@@ -37,9 +37,14 @@ function Navbar() {
                 </Link>
               </>
             ) : (
-              <Link to="/" className={linkClass('/')}>
-                Home
-              </Link>
+              <>
+                <Link to="/" className={linkClass('/')}>
+                  Quizzes
+                </Link>
+                <Link to="/history" className={linkClass('/history')}>
+                  My Attempts
+                </Link>
+              </>
             )}
           </div>
         </div>

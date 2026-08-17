@@ -53,11 +53,19 @@ function Result() {
 
           <div className="flex gap-3">
             <button
+              onClick={() => navigate(`/review/${result.attempt_id}`)}
+              className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded text-sm"
+            >
+              Review Answers
+            </button>
+
+            <button
               onClick={() => navigate('/')}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm"
             >
               Back to Quizzes
             </button>
+
           </div>
         </div>
       </div>

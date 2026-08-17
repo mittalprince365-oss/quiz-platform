@@ -187,4 +187,72 @@ router.post('/quizzes/:id/submit', async (req, res) => {
     client.release();
   }
 });
+// ===== MY ATTEMPTS (history) =====
+router.get('/my-attempts', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT a.*, q.title AS quiz_title, q.category
+       FROM attempts a
+       JOIN quizzes q ON a.quiz_id = q.id
+       WHERE a.user_id = $1
+       ORDER BY a.completed_at DESC`,
+      [req.user.id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.log('My attempts error:', err.message);
+    res.status(500).json({ error: 'Could not fetch attempts' });
+  }
+});
+
+// ===== ONE ATTEMPT REVIEW (with answers) =====
+router.get('/attempts/:id', async (req, res) => {
+  try {
+    // attempt laao (sirf apna)
+    const attemptR = await pool.query(
+      `SELECT a.*, q.title AS quiz_title
+       FROM attempts a
+       JOIN quizzes q ON a.quiz_id = q.id
+       WHERE a.id = $1 AND a.user_id = $2`,
+      [req.params.id, req.user.id]
+    );
+    if (attemptR.rows.length === 0) {
+      return res.status(404).json({ error: 'Attempt not found' });
+    }
+    const attempt = attemptR.rows[0];
+
+    // har question: text, options, student ka jawab, sahi jawab, explanation
+    const questionsR = await pool.query(
+      'SELECT * FROM questions WHERE quiz_id = $1 ORDER BY id',
+      [attempt.quiz_id]
+    );
+
+    const review = await Promise.all(
+      questionsR.rows.map(async (q) => {
+        const optsR = await pool.query(
+          'SELECT * FROM options WHERE question_id = $1 ORDER BY id',
+          [q.id]
+        );
+        // student ne is question pe kya chuna tha?
+        const ansR = await pool.query(
+          'SELECT selected_option_id, is_correct FROM answers WHERE attempt_id = $1 AND question_id = $2',
+          [req.params.id, q.id]
+        );
+        const studentAns = ansR.rows[0] || {};
+        return {
+          question_text: q.question_text,
+          explanation: q.explanation,
+          options: optsR.rows, // is_correct isme hai (result ke baad dikhana OK)
+          selected_option_id: studentAns.selected_option_id || null,
+          is_correct: studentAns.is_correct || false,
+        };
+      })
+    );
+
+    res.json({ attempt, review });
+  } catch (err) {
+    console.log('Attempt review error:', err.message);
+    res.status(500).json({ error: 'Could not fetch review' });
+  }
+});
 module.exports = router;
