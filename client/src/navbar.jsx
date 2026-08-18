@@ -35,6 +35,9 @@ function Navbar() {
                 <Link to="/admin/quizzes" className={linkClass('/admin/quizzes')}>
                   Quizzes
                 </Link>
+                <Link to="/leaderboard" className={linkClass('/leaderboard')}>
+                  Leaderboard
+                </Link>
               </>
             ) : (
               <>
@@ -44,8 +47,11 @@ function Navbar() {
                 <Link to="/history" className={linkClass('/history')}>
                   My Attempts
                 </Link>
-                                <Link to="/dashboard" className={linkClass('/dashboard')}>
+                <Link to="/dashboard" className={linkClass('/dashboard')}>
                   Dashboard
+                </Link>
+                <Link to="/leaderboard" className={linkClass('/leaderboard')}>
+                  Leaderboard
                 </Link>
               </>
             )}

@@ -12,6 +12,7 @@ import Result from './Result'
 import AttemptHistory from './AttemptHistory'
 import AttemptReview from './AttemptReview'
 import StudentDashboard from './StudentDashboard'
+import Leaderboard from './Leaderboard'
 
 function StudentHome() {
   const user = JSON.parse(localStorage.getItem('user') || 'null')
@@ -37,6 +38,7 @@ function App() {
         <Route path="/history" element={<AttemptHistory />} />
         <Route path="/review/:id" element={<AttemptReview />} />
                 <Route path="/dashboard" element={<StudentDashboard />} />
+                        <Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
     </BrowserRouter>
   )

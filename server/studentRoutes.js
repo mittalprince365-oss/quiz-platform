@@ -291,4 +291,51 @@ router.get('/dashboard', async (req, res) => {
     res.status(500).json({ error: 'Could not fetch dashboard' });
   }
 });
+// ===== LEADERBOARD =====
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const { category = '' } = req.query;
+
+    // har student ka best performance (average % + best %)
+    const result = await pool.query(
+      `SELECT
+        u.id, u.name,
+        COUNT(a.id) AS total_attempts,
+        ROUND(AVG(a.percentage), 1) AS avg_score,
+        MAX(a.percentage) AS best_score
+       FROM users u
+       JOIN attempts a ON a.user_id = u.id
+       JOIN quizzes q ON a.quiz_id = q.id
+       WHERE u.role = 'STUDENT'
+         AND ($1 = '' OR q.category = $1)
+       GROUP BY u.id, u.name
+       ORDER BY avg_score DESC, best_score DESC
+       LIMIT 20`,
+      [category]
+    );
+
+    res.json(result.rows.map((r, i) => ({
+      rank: i + 1,
+      name: r.name,
+      total_attempts: parseInt(r.total_attempts),
+      avg_score: parseFloat(r.avg_score),
+      best_score: parseFloat(r.best_score),
+    })));
+  } catch (err) {
+    console.log('Leaderboard error:', err.message);
+    res.status(500).json({ error: 'Could not fetch leaderboard' });
+  }
+});
+
+// ===== CATEGORIES (leaderboard filter ke liye) =====
+router.get('/categories', async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT DISTINCT category FROM quizzes WHERE status = 'Published' ORDER BY category"
+    );
+    res.json(result.rows.map((r) => r.category));
+  } catch (err) {
+    res.status(500).json({ error: 'Could not fetch categories' });
+  }
+});
 module.exports = router;
