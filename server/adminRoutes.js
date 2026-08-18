@@ -10,29 +10,71 @@ router.use(requireAuth, requireAdmin);
 // ===== DASHBOARD STATS =====
 router.get('/stats', async (req, res) => {
   try {
-    const totalStudents = await pool.query(
-      "SELECT COUNT(*) FROM users WHERE role = 'STUDENT'"
-    );
-    const totalAdmins = await pool.query(
-      "SELECT COUNT(*) FROM users WHERE role = 'ADMIN'"
-    );
-    const activeUsers = await pool.query(
-      "SELECT COUNT(*) FROM users WHERE status = 'ACTIVE'"
-    );
+    const students = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'STUDENT'");
+    const admins = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'ADMIN'");
+    const active = await pool.query("SELECT COUNT(*) FROM users WHERE status = 'ACTIVE'");
+    const quizzes = await pool.query("SELECT COUNT(*) FROM quizzes");
+    const published = await pool.query("SELECT COUNT(*) FROM quizzes WHERE status = 'Published'");
+    const questions = await pool.query("SELECT COUNT(*) FROM questions");
+    const attempts = await pool.query("SELECT COUNT(*) FROM attempts");
+    const passed = await pool.query("SELECT COUNT(*) FROM attempts WHERE status = 'PASSED'");
+    const avgScore = await pool.query("SELECT COALESCE(ROUND(AVG(percentage),1),0) AS avg FROM attempts");
 
     res.json({
-      totalStudents: parseInt(totalStudents.rows[0].count),
-      totalAdmins: parseInt(totalAdmins.rows[0].count),
-      activeUsers: parseInt(activeUsers.rows[0].count),
-      // quiz stats Day 5 ke baad add karenge (abhi table hi nahi hai)
-      totalQuizzes: 0,
-      totalAttempts: 0,
+      totalStudents: parseInt(students.rows[0].count),
+      totalAdmins: parseInt(admins.rows[0].count),
+      activeUsers: parseInt(active.rows[0].count),
+      totalQuizzes: parseInt(quizzes.rows[0].count),
+      publishedQuizzes: parseInt(published.rows[0].count),
+      totalQuestions: parseInt(questions.rows[0].count),
+      totalAttempts: parseInt(attempts.rows[0].count),
+      passedAttempts: parseInt(passed.rows[0].count),
+      averageScore: parseFloat(avgScore.rows[0].avg),
     });
   } catch (err) {
     console.log('Stats error:', err.message);
     res.status(500).json({ error: 'Could not fetch stats' });
   }
 });
+
+// ===== ANALYTICS (charts data) =====
+router.get('/analytics', async (req, res) => {
+  try {
+    const passFail = await pool.query(
+      `SELECT
+        COUNT(*) FILTER (WHERE status = 'PASSED') AS passed,
+        COUNT(*) FILTER (WHERE status = 'FAILED') AS failed
+       FROM attempts`
+    );
+
+    const popular = await pool.query(
+      `SELECT q.title, COUNT(a.id) AS attempts
+       FROM quizzes q
+       LEFT JOIN attempts a ON a.quiz_id = q.id
+       GROUP BY q.id, q.title
+       ORDER BY attempts DESC
+       LIMIT 5`
+    );
+
+    const overTime = await pool.query(
+      `SELECT TO_CHAR(completed_at::date, 'DD Mon') AS day, COUNT(*) AS count
+       FROM attempts
+       WHERE completed_at >= NOW() - INTERVAL '7 days'
+       GROUP BY completed_at::date
+       ORDER BY completed_at::date`
+    );
+
+    res.json({
+      passFail: passFail.rows[0],
+      popular: popular.rows.map((r) => ({ title: r.title, attempts: parseInt(r.attempts) })),
+      overTime: overTime.rows.map((r) => ({ day: r.day, count: parseInt(r.count) })),
+    });
+  } catch (err) {
+    console.log('Analytics error:', err.message);
+    res.status(500).json({ error: 'Could not fetch analytics' });
+  }
+});
+
 // ===== ALL STUDENTS (with search) =====
 router.get('/users', async (req, res) => {
   try {
@@ -55,7 +97,7 @@ router.get('/users', async (req, res) => {
 router.patch('/users/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body; // 'ACTIVE' or 'INACTIVE'
+    const { status } = req.body;
 
     if (!['ACTIVE', 'INACTIVE'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
