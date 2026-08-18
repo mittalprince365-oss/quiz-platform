@@ -20,7 +20,12 @@ function StudentHome() {
   if (user.role === 'ADMIN') return <Navigate to="/admin" />
   return <StudentQuizzes />
 }
-
+function AdminRoute({ children }) {
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+  if (!user) return <Navigate to="/login" />
+  if (user.role !== 'ADMIN') return <Navigate to="/" />
+  return children
+}
 function App() {
   return (
     <BrowserRouter>
@@ -28,10 +33,10 @@ function App() {
         <Route path="/" element={<StudentHome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/quizzes" element={<AdminQuizzes />} />
-        <Route path="/admin/quizzes/:quizId/questions" element={<AdminQuestions />} />
+                <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+        <Route path="/admin/quizzes" element={<AdminRoute><AdminQuizzes /></AdminRoute>} />
+        <Route path="/admin/quizzes/:quizId/questions" element={<AdminRoute><AdminQuestions /></AdminRoute>} />
         <Route path="/quiz/:id" element={<QuizDetails />} />
         <Route path="/quiz/:id/attempt" element={<QuizAttempt />} />
         <Route path="/result" element={<Result />} />
