@@ -255,4 +255,40 @@ router.get('/attempts/:id', async (req, res) => {
     res.status(500).json({ error: 'Could not fetch review' });
   }
 });
+// ===== STUDENT DASHBOARD STATS =====
+router.get('/dashboard', async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const stats = await pool.query(
+      `SELECT
+        COUNT(*) AS total_attempts,
+        COUNT(*) FILTER (WHERE status = 'PASSED') AS passed,
+        COUNT(*) FILTER (WHERE status = 'FAILED') AS failed,
+        COALESCE(ROUND(AVG(percentage), 1), 0) AS average_score,
+        COALESCE(MAX(percentage), 0) AS highest_score
+       FROM attempts WHERE user_id = $1`,
+      [userId]
+    );
+
+    // recent 5 attempts (chart ke liye)
+    const recent = await pool.query(
+      `SELECT a.percentage, a.status, a.completed_at, q.title AS quiz_title
+       FROM attempts a
+       JOIN quizzes q ON a.quiz_id = q.id
+       WHERE a.user_id = $1
+       ORDER BY a.completed_at DESC
+       LIMIT 5`,
+      [userId]
+    );
+
+    res.json({
+      stats: stats.rows[0],
+      recent: recent.rows.reverse(), // chart ke liye purana-se-naya
+    });
+  } catch (err) {
+    console.log('Dashboard error:', err.message);
+    res.status(500).json({ error: 'Could not fetch dashboard' });
+  }
+});
 module.exports = router;

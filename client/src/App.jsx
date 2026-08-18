@@ -11,6 +11,7 @@ import QuizAttempt from './QuizAttempt'
 import Result from './Result'
 import AttemptHistory from './AttemptHistory'
 import AttemptReview from './AttemptReview'
+import StudentDashboard from './StudentDashboard'
 
 function StudentHome() {
   const user = JSON.parse(localStorage.getItem('user') || 'null')
@@ -35,6 +36,7 @@ function App() {
         <Route path="/result" element={<Result />} />
         <Route path="/history" element={<AttemptHistory />} />
         <Route path="/review/:id" element={<AttemptReview />} />
+                <Route path="/dashboard" element={<StudentDashboard />} />
       </Routes>
     </BrowserRouter>
   )

@@ -44,6 +44,9 @@ function Navbar() {
                 <Link to="/history" className={linkClass('/history')}>
                   My Attempts
                 </Link>
+                                <Link to="/dashboard" className={linkClass('/dashboard')}>
+                  Dashboard
+                </Link>
               </>
             )}
           </div>
