@@ -1,6 +1,9 @@
 # 📝 Quiz Management & Online Assessment Platform
 
 A full-stack web application for creating and taking online quizzes, with separate Admin and Student roles. Admins create quizzes and questions; students attempt them with a live timer, get auto-scored results, and track their performance.
+🌍 **Live Demo:** https://quiz-platform-taupe-eta.vercel.app
+🔗 **API:** https://quiz-platform-api-7a4i.onrender.com
+
 
 ## Features
 
